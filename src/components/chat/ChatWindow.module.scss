@@ -1,0 +1,11 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+}
+
+.message {
+  &--user {
+    opacity: 0.5;
+  }
+}
