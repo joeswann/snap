@@ -1,4 +1,4 @@
-import { XMLBuilder, XMLParser } from "fast-xml-parser";
+import { XMLBuilder, XMLParser } from "fast-xml-parser/src/fxp";
 
 type ToolParameter = {
   name: string;
@@ -51,8 +51,7 @@ const formatToolDescriptions = (tools: ToolDefinition[]) => {
 };
 
 export const systemPrompt = (tools: ToolDefinition[]) => {
-  return `
-In this environment you have access to a set of tools you can use to answer the user's question.
+  return `In this environment you have access to a set of tools you can use to answer the user's question.
 
 You may call them like this:
 <function_calls>
@@ -67,23 +66,26 @@ You may call them like this:
 
 Here are the tools available:
 ${formatToolDescriptions(tools)}
+
+Please note, when you get results from a tool, please summarise the answer in plain text.
 `;
 };
 
 const getFunctionCalls = (message: string) => {
   const functionCalls = message.match(/<invoke>([\s\S]*?)<\/invoke>/g);
   if (functionCalls) {
-    return functionCalls.map(getFunctionCall);
+    return functionCalls.map(getFunctionCall).filter(Boolean);
   }
   return [];
 };
 
 const getFunctionCall = (message: string) => {
-  return parser.parse(message) as ToolInvocation;
+  return parser.parse(message)?.invoke as ToolInvocation;
 };
 
 const getFunctionResults = async (tools: ToolDefinition[], message: string) => {
   const calls = getFunctionCalls(message);
+  console.log({ calls });
 
   const resultPromises = calls.map(async (call) => {
     const { tool_name, parameters } = call;

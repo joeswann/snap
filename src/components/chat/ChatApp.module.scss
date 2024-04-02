@@ -13,6 +13,10 @@
   }
 }
 
+.window {
+  height: calc(100vh - 200px - 60px);
+}
+
 .sidebar {
   grid-row: 1 / -1;
 }

@@ -19,8 +19,7 @@ export const ChatProvider: DefaultComponentInterface = ({
   children,
   ...props
 }) => {
-  const { register, handleSubmit, watch, reset, setValue, formState } =
-    useForm();
+  const { register, handleSubmit, reset } = useForm();
   const chatStore = useChatStore()();
 
   const onSubmit = handleSubmit(async (data) => {
