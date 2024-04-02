@@ -1,7 +1,6 @@
 import { useRef } from "react";
 import { create } from "zustand";
-import { useForm } from "react-hook-form";
-import { Messages } from "~/lib/ai/base";
+import { Messages } from "~/lib/ai/fetch";
 
 export type ChatStateType = {
   messages: Messages;
