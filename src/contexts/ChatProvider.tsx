@@ -1,11 +1,12 @@
 "use client";
+
 import { useContext, useEffect } from "react";
 import { createContext } from "react";
-
 import { DefaultComponentInterface } from "../types/components";
 import { ChatStoreType, useChatStore } from "~/store/useChatStore";
 import { useForm } from "react-hook-form";
-import { fetchMessages } from "~/lib/ai/client";
+import { AdditionTool, additionToolDescription } from "~/lib/ai/tools/addition";
+import ToolUser from "~/lib/ai/base";
 
 export const ChatContext = createContext<
   | (ChatStoreType & {
@@ -23,14 +24,18 @@ export const ChatProvider: DefaultComponentInterface = ({
     useForm();
   const chatStore = useChatStore()();
 
+  const additionTool = new AdditionTool();
+  const toolUser = new ToolUser([additionTool]);
+
   const onSubmit = handleSubmit(async (data) => {
-    const messages = await fetchMessages({
-      messages: [
-        ...chatStore.messages,
-        { role: "user", content: data.content },
-      ],
-    });
-    chatStore.setMessages(messages);
+    const messages = await toolUser.useTools(
+      [...chatStore.messages, { role: "user", content: data.content }],
+      [additionToolDescription],
+      0,
+      "automatic",
+    );
+
+    chatStore.setMessages(messages as any);
     reset();
   });
 
