@@ -23,6 +23,7 @@ export const ChatProvider: DefaultComponentInterface = ({
   const chatStore = useChatStore()();
 
   const onSubmit = handleSubmit(async (data) => {
+    if (data.content === "") return;
     reset();
     const messages = await fetchMessages([
       ...chatStore.messages,

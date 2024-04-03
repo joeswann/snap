@@ -2,6 +2,12 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { ToolDefinition, functionResults, systemPrompt } from "./format";
 import { tools } from "./tools";
+import {
+  ANTHROPIC_MAX_RETRIES,
+  ANTHROPIC_MAX_TOKENS,
+  ANTHROPIC_MODEL,
+  ANTHROPIC_TEMPERATURE,
+} from "../config";
 
 export type Message = {
   role: "user" | "assistant";
@@ -12,7 +18,7 @@ export type Messages = Message[];
 
 const anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY,
-  maxRetries: 4,
+  maxRetries: ANTHROPIC_MAX_RETRIES,
 });
 
 export const fetchWithTools = async ({
@@ -24,9 +30,9 @@ export const fetchWithTools = async ({
 }): Promise<Messages> => {
   try {
     const params: Anthropic.MessageCreateParams = {
-      model: "claude-3-opus-20240229",
-      max_tokens: 1024,
-      temperature: 0.5,
+      model: ANTHROPIC_MODEL,
+      max_tokens: ANTHROPIC_MAX_TOKENS,
+      temperature: ANTHROPIC_TEMPERATURE,
       messages: [...messages].filter(Boolean),
       system: systemPrompt(tools),
       stop_sequences: ["</function_calls>"],

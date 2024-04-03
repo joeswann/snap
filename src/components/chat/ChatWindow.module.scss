@@ -1,11 +1,15 @@
 .container {
   display: flex;
-  flex-direction: column-reverse;
+  flex-direction: column;
   gap: 40px;
   overflow-y: auto;
 }
 
 .message {
+  background: #444;
+  padding: 20px 30px;
+  border-radius: 8px;
+
   &--user {
     opacity: 0.5;
   }

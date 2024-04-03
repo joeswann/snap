@@ -13,20 +13,8 @@
   padding: 10px 12px;
 }
 
-.button {
-  margin-left: auto;
-  padding: 10px 20px;
-  border-radius: 10px;
-  border: 1px solid var(--color-foreground);
-  color: var(--color-foreground);
-  background: var(--color-background);
-  cursor: pointer;
-
-  &:hover {
-    color: var(--color-background);
-    background: var(--color-neutral);
-  }
-  &:active {
-    background: var(--color-neutral);
-  }
+.buttons {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
 }
