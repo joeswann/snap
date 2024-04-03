@@ -8,6 +8,9 @@ import { ChatProvider } from "~/contexts/ChatProvider";
 const ChatApp = () => {
   return (
     <ChatProvider>
+      <header className={styles.header}>
+        <h1>Snap</h1>
+      </header>
       <div className={styles.container}>
         <ChatSidebar className={styles.sidebar} />
         <ChatWindow className={styles.window} />

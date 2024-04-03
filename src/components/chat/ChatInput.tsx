@@ -20,10 +20,11 @@ const ChatInput: DefaultComponentInterface = ({ className }) => {
         required
       ></textarea>
       <div className={styles.buttons}>
-        <CommonButton className={styles.button}>Submit</CommonButton>
         <CommonButton className={styles.button} onClick={reset}>
           Reset
         </CommonButton>
+
+        <CommonButton className={styles.button}>Submit</CommonButton>
       </div>
     </form>
   );

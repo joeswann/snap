@@ -1,3 +1,5 @@
+@import "./reset.css";
+
 :root {
   --color-foreground: #eee;
   --color-background: #222;
@@ -6,6 +8,7 @@
 }
 
 body {
+  font-size: 14px;
   font-family: "Inter", sans-serif;
   font-optical-sizing: auto;
   font-weight: 300;

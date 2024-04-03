@@ -1,10 +1,15 @@
+.header {
+  padding: 16px 16px 0;
+  font-size: 14px;
+}
+
 .container {
   // min-height: 100vh;
   display: grid;
   grid-template-columns: 240px 1fr;
-  grid-template-rows: 1fr 200px;
-  gap: 20px;
-  padding: 20px;
+  grid-template-rows: 1fr 150px;
+  gap: 16px;
+  padding: 16px;
 
   > * {
     border: 1px solid var(--color-neutral);
@@ -14,7 +19,7 @@
 }
 
 .window {
-  height: calc(100vh - 340px);
+  height: calc(100vh - 250px);
 }
 
 .sidebar {
