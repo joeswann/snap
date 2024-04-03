@@ -7,10 +7,13 @@ import CommonButton from "../common/CommonButton";
 const ChatInput: DefaultComponentInterface = ({ className }) => {
   const { register, onSubmit, setMessages } = useChat();
 
-  const reset = (e: any) => {
-    e.prevenDefault();
-    setMessages([]);
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if ((e.metaKey || e.ctrlKey) && e.key === "Enter") {
+      e.preventDefault();
+      onSubmit();
+    }
   };
+
   return (
     <form onSubmit={onSubmit} className={cx(className, styles.container)}>
       <textarea
@@ -18,12 +21,9 @@ const ChatInput: DefaultComponentInterface = ({ className }) => {
         className={styles.input}
         placeholder="Chat"
         required
+        onKeyDown={handleKeyDown}
       ></textarea>
       <div className={styles.buttons}>
-        <CommonButton className={styles.button} onClick={reset}>
-          Reset
-        </CommonButton>
-
         <CommonButton className={styles.button}>Submit</CommonButton>
       </div>
     </form>
