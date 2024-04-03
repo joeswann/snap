@@ -2,6 +2,7 @@ import { DefaultComponentInterface } from "~/types/components";
 import cx from "classnames";
 import { useChat } from "~/contexts/ChatProvider";
 import styles from "./ChatWindow.module.scss";
+import CommonMarkdown from "../common/CommonMarkdown";
 
 const ChatWindow: DefaultComponentInterface = ({ className }) => {
   const { messages } = useChat();
@@ -12,7 +13,7 @@ const ChatWindow: DefaultComponentInterface = ({ className }) => {
           className={cx(styles.message, styles[`message--${message.role}`])}
           key={message.content}
         >
-          {message.content}
+          <CommonMarkdown>{message.content}</CommonMarkdown>
         </div>
       ))}
     </div>
