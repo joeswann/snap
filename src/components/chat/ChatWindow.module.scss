@@ -12,6 +12,10 @@
   padding: 20px 30px;
   border-radius: 8px;
 
+  pre {
+    text-wrap: balance;
+  }
+
   &--user {
     opacity: 0.5;
   }
