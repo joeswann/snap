@@ -1,3 +1,4 @@
+import { fetchClean } from "../fetch";
 import { ToolDefinition } from "../format";
 import { JSDOM } from "jsdom";
 
@@ -34,19 +35,16 @@ export const scrapeTool: ToolDefinition = {
     const doc = dom.window.document;
 
     // Remove unreadable tags
-    const tagsToRemove = ["head", "script", "img", "style", "svg"];
-    tagsToRemove.forEach((tag) => {
+    ["head", "script", "img", "style", "svg"].map((tag) => {
       const elements = doc.getElementsByTagName(tag);
-      while (elements.length > 0) {
-        elements?.[0].parentNode?.removeChild(elements[0]);
-      }
+      for (const e of elements) e.remove();
+      return elements;
     });
 
-    // Get the cleaned HTML
     const cleanedHtml = doc.documentElement.outerHTML;
+    const text = await fetchClean(cleanedHtml);
+    console.log(text);
 
-    console.log(cleanedHtml);
-
-    return cleanedHtml;
+    return text;
   },
 };

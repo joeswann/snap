@@ -8,6 +8,7 @@ import {
   ANTHROPIC_MODEL,
   ANTHROPIC_TEMPERATURE,
 } from "../config";
+import { warn } from "console";
 
 export type Message = {
   role: "user" | "assistant";
@@ -64,3 +65,25 @@ export const fetchMessages = (messages: Message[]) =>
     tools,
     messages,
   });
+
+export const fetchClean = async (code: string): Promise<string> => {
+  try {
+    const params: Anthropic.MessageCreateParams = {
+      model: "claude-3-haiku-20240307",
+      max_tokens: ANTHROPIC_MAX_TOKENS,
+      temperature: ANTHROPIC_TEMPERATURE,
+      messages: [
+        {
+          role: "user",
+          content: `please use this and send written information contained without skipping or summarising. also include any links in the main content\n\n${code}`,
+        },
+      ],
+    };
+    const response = await anthropic.messages.create(params);
+    const content = response.content[0].text;
+    return content;
+  } catch (e) {
+    console.log(e);
+    return "Error occurred while cleaning up the code.";
+  }
+};

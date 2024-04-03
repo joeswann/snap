@@ -10,6 +10,7 @@ import { fetchMessages } from "~/lib/ai/fetch";
 export const ChatContext = createContext<
   | (ChatStoreType & {
       onSubmit: () => void;
+      reset: () => void;
       register: any;
     })
   | null
@@ -19,12 +20,12 @@ export const ChatProvider: DefaultComponentInterface = ({
   children,
   ...props
 }) => {
-  const { register, handleSubmit, reset } = useForm();
+  const { register, handleSubmit, reset: formReset } = useForm();
   const chatStore = useChatStore()();
 
   const onSubmit = handleSubmit(async (data) => {
     if (data.content === "") return;
-    reset();
+    formReset();
     const messages = await fetchMessages([
       ...chatStore.messages,
       { role: "user", content: data.content },
@@ -33,8 +34,14 @@ export const ChatProvider: DefaultComponentInterface = ({
     chatStore.setMessages(messages);
   });
 
+  const reset = () => {
+    console.log("reset");
+    formReset();
+    chatStore.setMessages([]);
+  };
+
   return (
-    <ChatContext.Provider value={{ ...chatStore, onSubmit, register }}>
+    <ChatContext.Provider value={{ ...chatStore, reset, onSubmit, register }}>
       {children}
     </ChatContext.Provider>
   );
