@@ -21,7 +21,9 @@ type ToolInvocation = {
 };
 
 const builder = new XMLBuilder({});
-const parser = new XMLParser({});
+const parser = new XMLParser({
+  ignoreAttributes: false,
+});
 
 const getToolDescription = (tool: ToolDefinition) => {
   const params = {
@@ -80,12 +82,14 @@ const getFunctionCalls = (message: string) => {
 };
 
 const getFunctionCall = (message: string) => {
-  return parser.parse(message)?.invoke as ToolInvocation;
+  // Replace newline characters with actual newlines
+  const cleanedMessage = message.replace(/\\n/g, "\n");
+  console.log(JSON.stringify(parser.parse(cleanedMessage), null, 2));
+  return parser.parse(cleanedMessage)?.invoke as ToolInvocation;
 };
 
 const getFunctionResults = async (tools: ToolDefinition[], message: string) => {
   const calls = getFunctionCalls(message);
-  console.log({ calls });
 
   const resultPromises = calls.map(async (call) => {
     const { tool_name, parameters } = call;
