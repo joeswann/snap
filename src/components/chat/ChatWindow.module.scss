@@ -1,16 +1,19 @@
 .container {
-  display: flex;
+  display: grid;
   flex-direction: column;
   gap: 20px;
   overflow-y: auto;
+  grid-template-columns: 100px 1fr 100px;
 }
 
 .message {
   font-size: 14px;
   line-height: 1.4;
-  background: #444;
+  background: #648;
   padding: 20px 30px;
   border-radius: 8px;
+  grid-column: 2 / -1;
+  margin-bottom: auto;
 
   pre {
     text-wrap: balance;
@@ -21,6 +24,7 @@
   }
 
   &--user {
-    opacity: 0.5;
+    background: #444;
+    grid-column: 1 / 3;
   }
 }

@@ -1,4 +1,4 @@
-import { ToolDefinition } from "../format";
+import { ToolDefinition } from "../types";
 
 export const searchTool: ToolDefinition = {
   name: "fetch_google_results",
@@ -42,7 +42,7 @@ export const searchTool: ToolDefinition = {
         )}
 
         Questions:
-        ${json.peopleAlsoAsk.map(
+        ${json.peopleAlsoAsk?.map(
           (result: any) => `
         Question: ${result.question}
         Answer: ${result.snippet}

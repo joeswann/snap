@@ -12,46 +12,39 @@ import { clientFetch } from "./client";
 import { formatMessage } from "./format";
 
 export async function fetchMessage(
-  messages: InputMessage[],
-): Promise<InputMessage[] | null> {
-  const responseMessage: OutputMessage | null = await clientFetch({
+  messages: OutputMessage[],
+): Promise<OutputMessage[] | null> {
+  const reply: OutputMessage | null = await clientFetch({
     tools: toolDefinitions,
     messages,
   });
 
-  if (!responseMessage) return messages;
+  if (!reply) return messages;
 
-  if (
-    responseMessage.role === "assistant" &&
-    responseMessage.stop_reason === "tool_use"
-  ) {
-    const toolUseContent = responseMessage.content.find(
+  if (reply.role === "assistant" && reply.stop_reason === "tool_use") {
+    const toolUseContent = reply.content.find(
       (content) => content.type === "tool_use",
     ) as Content;
 
     if (toolUseContent) {
       const { name, input, id } = toolUseContent;
 
-      const toolResultMessage: OutputMessage = {
+      const toolReply: OutputMessage = {
         role: "user",
         content: [
           {
             type: "tool_result",
             tool_use_id: id,
-            text: await fetchToolResponse(`${name}`, input),
-          },
+            content: await fetchToolResponse(`${name}`, input),
+          } as any,
         ],
       };
 
-      return fetchMessage([
-        ...messages,
-        ...formatMessage(responseMessage),
-        ...formatMessage(toolResultMessage),
-      ]);
+      return fetchMessage([...messages, formatMessage(reply), toolReply]);
     }
   }
 
-  return [...messages, ...formatMessage(responseMessage)];
+  return [...messages, formatMessage(reply)];
 }
 
 export const fetchClean = async (code: string): Promise<string> => {

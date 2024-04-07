@@ -8,9 +8,9 @@ function formatTool(input: ToolDefinition): any {
   return {
     name: input.name,
     description: input.description,
-    // required: input.parameters.map((param) => param.name),
     input_schema: {
       type: "object",
+      required: input.parameters.map((param) => param.name),
       properties: input.parameters.reduce((c, v) => {
         return {
           ...c,
@@ -26,11 +26,9 @@ function formatTool(input: ToolDefinition): any {
 
 export const formatTools = (tools: ToolDefinition[]) => tools.map(formatTool);
 
-export const formatMessage = (response: OutputMessage) => {
-  return response.content
-    .map((message) => ({
-      role: response.role,
-      content: message.text,
-    }))
-    .filter((v) => !!v.role && !!v.content) as InputMessage[];
+export const formatMessage = (message: OutputMessage) => {
+  return {
+    role: message.role,
+    content: message.content,
+  };
 };

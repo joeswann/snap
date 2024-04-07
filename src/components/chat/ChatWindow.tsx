@@ -4,6 +4,7 @@ import { useChat } from "~/contexts/ChatProvider";
 import styles from "./ChatWindow.module.scss";
 import CommonMarkdown from "../common/CommonMarkdown";
 import { useEffect, useRef } from "react";
+import { OutputMessage } from "~/lib/ai/types";
 
 const ChatWindow: DefaultComponentInterface = ({ className }) => {
   const { messages } = useChat();
@@ -14,6 +15,19 @@ const ChatWindow: DefaultComponentInterface = ({ className }) => {
       containerRef.current.scrollTop = containerRef.current.scrollHeight;
     }
   }, [messages]);
+
+  const formatContentToMarkdown = (message: OutputMessage) => {
+    if (typeof message.content === "string") return message.content;
+
+    return message.content
+      .map((content) => {
+        if (content.type === "text") {
+          return `${content.text}`;
+        }
+        return (content as any).content || content.name;
+      })
+      .join("\n\n");
+  };
 
   return (
     <div className={cx(className, styles.container)} ref={containerRef}>
@@ -30,7 +44,7 @@ const ChatWindow: DefaultComponentInterface = ({ className }) => {
           className={cx(styles.message, styles[`message--${message.role}`])}
           key={message.content}
         >
-          <CommonMarkdown>{message.content || message.text}</CommonMarkdown>
+          <CommonMarkdown>{formatContentToMarkdown(message)}</CommonMarkdown>
         </div>
       ))}
     </div>
