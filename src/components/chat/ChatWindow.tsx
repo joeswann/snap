@@ -25,12 +25,12 @@ const ChatWindow: DefaultComponentInterface = ({ className }) => {
           </CommonMarkdown>
         </div>
       )}
-      {messages.map((message) => (
+      {messages.map((message: any) => (
         <div
           className={cx(styles.message, styles[`message--${message.role}`])}
           key={message.content}
         >
-          <CommonMarkdown>{message.content}</CommonMarkdown>
+          <CommonMarkdown>{message.content || message.text}</CommonMarkdown>
         </div>
       ))}
     </div>

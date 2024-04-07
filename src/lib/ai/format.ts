@@ -1,122 +1,36 @@
-import { XMLBuilder, XMLParser } from "fast-xml-parser/src/fxp";
-
-type ToolParameter = {
-  name: string;
-  type: "string" | "number" | "boolean";
-  description: string;
-};
-
-export type ToolDefinition = {
-  name: string;
-  description: string;
-  parameters: ToolParameter[];
-  execute: (parameters: {
-    [key: string]: string | number | boolean;
-  }) => Promise<string>;
-};
-
-type ToolInvocation = {
-  tool_name: string;
-  parameters: { [key: string]: string | number | boolean };
-};
-
-const builder = new XMLBuilder({});
-const parser = new XMLParser({
-  ignoreAttributes: false,
-});
-
-const getToolDescription = (tool: ToolDefinition) => {
-  const params = {
-    tool_description: {
-      tool_name: tool.name,
-      description: tool.description,
-      parameters: tool.parameters.map((param) => ({
-        parameter: {
-          name: param.name,
-          type: param.type,
-          description: param.description,
-        },
-      })),
-    },
-  };
-  return params;
-};
-
-const getToolDescriptions = (tools: ToolDefinition[]) => {
-  return {
-    tools: tools.map(getToolDescription),
-  };
-};
-
-const formatToolDescriptions = (tools: ToolDefinition[]) => {
-  return builder.build(getToolDescriptions(tools));
-};
-
-export const systemPrompt = (tools: ToolDefinition[]) => {
-  return `In this environment you have access to a set of tools you can use to answer the user's question.
-
-You may call them like this:
-<function_calls>
-<invoke>
-<tool_name>$TOOL_NAME</tool_name>
-<parameters>
-<$PARAMETER_NAME>$PARAMETER_VALUE</$PARAMETER_NAME>
-...
-</parameters>
-</invoke>
-</function_calls>
-
-Here are the tools available:
-${formatToolDescriptions(tools)}
-
-Please note, when you get results from a tool, please summarise the answer in plain text.
+import { InputMessage, OutputMessage, ToolDefinition } from "./types";
+export const systemPrompt = () => `
+  In this environment you have access to a set of tools you can use to answer the user's question.
+  Please note, when you get results from a tool, please summarise the answer in plain text.
 `;
-};
 
-const getFunctionCalls = (message: string) => {
-  const functionCalls = message.match(/<invoke>([\s\S]*?)<\/invoke>/g);
-  if (functionCalls) {
-    return functionCalls.map(getFunctionCall).filter(Boolean);
-  }
-  return [];
-};
-
-const getFunctionCall = (message: string) => {
-  // Replace newline characters with actual newlines
-  const cleanedMessage = message.replace(/\\n/g, "\n");
-  console.log(JSON.stringify(parser.parse(cleanedMessage), null, 2));
-  return parser.parse(cleanedMessage)?.invoke as ToolInvocation;
-};
-
-const getFunctionResults = async (tools: ToolDefinition[], message: string) => {
-  const calls = getFunctionCalls(message);
-
-  const resultPromises = calls.map(async (call) => {
-    const { tool_name, parameters } = call;
-    const tool = tools.find((tool) => tool.name === tool_name);
-    if (tool) {
-      try {
-        const result = await tool.execute(parameters);
+function formatTool(input: ToolDefinition): any {
+  return {
+    name: input.name,
+    description: input.description,
+    // required: input.parameters.map((param) => param.name),
+    input_schema: {
+      type: "object",
+      properties: input.parameters.reduce((c, v) => {
         return {
-          result: {
-            tool_name,
-            stdout: result,
+          ...c,
+          [v.name]: {
+            type: v.type,
+            description: v.description,
           },
         };
-      } catch (e: any) {
-        return {
-          error: e.message,
-        };
-      }
-    }
-  });
+      }, {}),
+    },
+  };
+}
 
-  return { function_results: await Promise.all(resultPromises) };
-};
+export const formatTools = (tools: ToolDefinition[]) => tools.map(formatTool);
 
-export const functionResults = async (
-  tools: ToolDefinition[],
-  message: string,
-) => {
-  return builder.build(await getFunctionResults(tools, message)) as string;
+export const formatMessage = (response: OutputMessage) => {
+  return response.content
+    .map((message) => ({
+      role: response.role,
+      content: message.text,
+    }))
+    .filter((v) => !!v.role && !!v.content) as InputMessage[];
 };

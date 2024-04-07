@@ -5,7 +5,7 @@ import { createContext } from "react";
 import { DefaultComponentInterface } from "../types/components";
 import { ChatStoreType, useChatStore } from "~/store/useChatStore";
 import { useForm } from "react-hook-form";
-import { fetchMessages } from "~/lib/ai/fetch";
+import { fetchMessage } from "~/lib/ai/fetch";
 
 export const ChatContext = createContext<
   | (ChatStoreType & {
@@ -16,17 +16,14 @@ export const ChatContext = createContext<
   | null
 >(null);
 
-export const ChatProvider: DefaultComponentInterface = ({
-  children,
-  ...props
-}) => {
+export const ChatProvider: DefaultComponentInterface = ({ children }) => {
   const { register, handleSubmit, reset: formReset } = useForm();
   const chatStore = useChatStore()();
 
   const onSubmit = handleSubmit(async (data) => {
     if (data.content === "") return;
     formReset();
-    const messages = await fetchMessages([
+    const messages = await fetchMessage([
       ...chatStore.messages,
       { role: "user", content: data.content },
     ]);

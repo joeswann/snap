@@ -5,7 +5,7 @@ import useChat from "~/contexts/ChatProvider";
 import CommonButton from "../common/CommonButton";
 
 const ChatInput: DefaultComponentInterface = ({ className }) => {
-  const { register, onSubmit, setMessages } = useChat();
+  const { register, onSubmit } = useChat();
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if ((e.metaKey || e.ctrlKey) && e.key === "Enter") {

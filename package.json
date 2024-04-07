@@ -14,13 +14,14 @@
     "react-dom": "^18"
   },
   "devDependencies": {
-    "@anthropic-ai/sdk": "^0.19.1",
+    "@anthropic-ai/sdk": "^0.20.1",
     "@types/jsdom": "^21.1.6",
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",
     "@types/react-syntax-highlighter": "^15.5.11",
     "autoprefixer": "^10.0.1",
+    "axios": "^1.6.8",
     "classnames": "^2.5.1",
     "eslint": "^8",
     "eslint-config-next": "14.1.4",
