@@ -11,7 +11,6 @@ export const searchTool: ToolDefinition = {
     },
   ],
   execute: async (parameters: { [key: string]: string | number | boolean }) => {
-    "use server";
     const query = parameters["query"] as string;
     const url = "https://google.serper.dev/search";
 

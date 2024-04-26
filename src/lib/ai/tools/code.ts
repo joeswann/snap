@@ -1,5 +1,5 @@
-import { ToolDefinition } from "../format";
 import fetch from "node-fetch";
+import { ToolDefinition } from "../types";
 
 export const codeTool: ToolDefinition = {
   name: "run_code",

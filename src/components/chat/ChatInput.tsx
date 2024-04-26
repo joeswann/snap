@@ -1,3 +1,4 @@
+"use client";
 import { DefaultComponentInterface } from "~/types/components";
 import cx from "classnames";
 import styles from "./ChatInput.module.scss";

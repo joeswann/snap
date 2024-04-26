@@ -1,9 +1,9 @@
 import { useRef } from "react";
 import { create } from "zustand";
-import { Messages } from "~/lib/ai/fetch";
+import { OutputMessage } from "~/lib/ai/types";
 
 export type ChatStateType = {
-  messages: Messages;
+  messages: OutputMessage[];
 };
 
 export type ChatStoreType = ChatStateType & {
@@ -12,7 +12,7 @@ export type ChatStoreType = ChatStateType & {
 
 export const useChatStore = () => {
   const store = useRef(
-    create<ChatStoreType>()((set, get) => ({
+    create<ChatStoreType>()((set) => ({
       messages: [],
 
       setMessages(messages) {

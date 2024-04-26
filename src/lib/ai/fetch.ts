@@ -1,75 +1,41 @@
 "use server";
 
-import { InputMessage, Content, OutputMessage } from "./types";
-import {
-  ANTHROPIC_MAX_RETRIES,
-  ANTHROPIC_MAX_TOKENS,
-  ANTHROPIC_TEMPERATURE,
-} from "../config";
-import Anthropic from "@anthropic-ai/sdk";
-import { fetchToolResponse, toolDefinitions } from "./tools";
-import { clientFetch } from "./client";
-import { formatMessage } from "./format";
+import axios, { AxiosResponse } from "axios";
 
-export async function fetchMessage(
-  messages: OutputMessage[],
-): Promise<OutputMessage[] | null> {
-  const reply: OutputMessage | null = await clientFetch({
-    tools: toolDefinitions,
-    messages,
+import {
+  ANTHROPIC_MAX_TOKENS,
+  ANTHROPIC_MODEL,
+  ANTHROPIC_TEMPERATURE,
+  SYSTEM_PROMPT,
+} from "../config";
+
+const claudeClient = () =>
+  axios.create({
+    baseURL: "https://api.anthropic.com",
+    headers: {
+      "x-api-key": process.env.ANTHROPIC_API_KEY,
+      "Content-Type": "application/json",
+      "anthropic-version": "2023-06-01",
+      "anthropic-beta": "tools-2024-04-04",
+    },
   });
 
-  if (!reply) return messages;
-
-  if (reply.role === "assistant" && reply.stop_reason === "tool_use") {
-    const toolUseContent = reply.content.find(
-      (content) => content.type === "tool_use",
-    ) as Content;
-
-    if (toolUseContent) {
-      const { name, input, id } = toolUseContent;
-
-      const toolReply: OutputMessage = {
-        role: "user",
-        content: [
-          {
-            type: "tool_result",
-            tool_use_id: id,
-            content: await fetchToolResponse(`${name}`, input),
-          } as any,
-        ],
-      };
-
-      return fetchMessage([...messages, formatMessage(reply), toolReply]);
-    }
-  }
-
-  return [...messages, formatMessage(reply)];
-}
-
-export const fetchClean = async (code: string): Promise<string> => {
+export const fetchClaudeResponse = async (params: { [key: string]: any }) => {
   try {
-    const anthropic = new Anthropic({
-      apiKey: process.env.ANTHROPIC_API_KEY,
-      maxRetries: ANTHROPIC_MAX_RETRIES,
+    const response = await claudeClient().request({
+      method: "post",
+      url: "/v1/messages",
+      data: {
+        system: SYSTEM_PROMPT,
+        model: ANTHROPIC_MODEL,
+        max_tokens: ANTHROPIC_MAX_TOKENS,
+        temperature: ANTHROPIC_TEMPERATURE,
+        ...params,
+      },
     });
-
-    const params: Anthropic.MessageCreateParams = {
-      model: "claude-3-haiku-20240307",
-      max_tokens: ANTHROPIC_MAX_TOKENS,
-      temperature: ANTHROPIC_TEMPERATURE,
-      messages: [
-        {
-          role: "user",
-          content: `please use this and send written information contained without skipping or summarising. also include any links in the main content\n\n${code}`,
-        },
-      ],
-    };
-    const response = await anthropic.messages.create(params);
-    const content = response.content[0].text;
-    return content;
-  } catch (e) {
-    console.log(e);
-    return "Error occurred while cleaning up the code.";
+    return response.data;
+  } catch (e: any) {
+    console.log("error", JSON.stringify(e.response.data, null, 2));
+    return null;
   }
 };

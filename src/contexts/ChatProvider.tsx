@@ -1,11 +1,12 @@
 "use client";
-import { useContext, useEffect } from "react";
+import { useContext, useState } from "react";
 import { createContext } from "react";
+import { useForm } from "react-hook-form";
 
 import { DefaultComponentInterface } from "../types/components";
-import { ChatStoreType, useChatStore } from "~/store/useChatStore";
-import { useForm } from "react-hook-form";
-import { fetchMessage } from "~/lib/ai/fetch";
+import { ChatStoreType } from "~/store/useChatStore";
+import { OutputMessage } from "~/lib/ai/types";
+import { fetchMessages } from "~/lib/ai/messages";
 
 export const ChatContext = createContext<
   | (ChatStoreType & {
@@ -17,28 +18,33 @@ export const ChatContext = createContext<
 >(null);
 
 export const ChatProvider: DefaultComponentInterface = ({ children }) => {
-  const { register, handleSubmit, reset: formReset } = useForm();
-  const chatStore = useChatStore()();
+  const { handleSubmit, reset: formReset, register } = useForm();
+  const [messages, setMessages] = useState<OutputMessage[]>([]);
 
   const onSubmit = handleSubmit(async (data) => {
     if (data.content === "") return;
     formReset();
-    const messages = await fetchMessage([
-      ...chatStore.messages,
-      { role: "user", content: data.content },
-    ]);
-
-    chatStore.setMessages(messages);
+    await fetchMessages(
+      [...messages, { role: "user", content: data.content }],
+      setMessages,
+    );
   });
 
   const reset = () => {
     console.log("reset");
     formReset();
-    chatStore.setMessages([]);
+    setMessages([]);
   };
-
   return (
-    <ChatContext.Provider value={{ ...chatStore, reset, onSubmit, register }}>
+    <ChatContext.Provider
+      value={{
+        messages,
+        setMessages,
+        onSubmit,
+        reset,
+        register,
+      }}
+    >
       {children}
     </ChatContext.Provider>
   );
